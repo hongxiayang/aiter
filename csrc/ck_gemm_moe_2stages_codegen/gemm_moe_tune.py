@@ -8293,6 +8293,19 @@ class Mxfp4FlydslTuner(FmoeTuner):
         candidates = self._candidate_rows(
             row, full_search=_mxfp4_search_mode(args) == "full"
         )
+        kept = [
+            c
+            for c in candidates
+            if not _is_tune_excluded_kernel(c["kernelName1"])
+            and not _is_tune_excluded_kernel(c["kernelName2"])
+        ]
+        if len(kept) < len(candidates):
+            print(
+                f"[mxfp4-port] excluded {len(candidates) - len(kept)} candidates "
+                "(AITER_FMOE_TUNE_EXCLUDE_KERNELS)",
+                flush=True,
+            )
+            candidates = kept
         fast_scan = bool(getattr(args, "fast_scan", False))
         best, failures, successful = None, [], []
 
